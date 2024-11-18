@@ -100,7 +100,6 @@ class MainActivity : AppCompatActivity() {
             .setTitle("Confirm Delete")
             .setMessage("Are you sure you want to delete ${student.studentName}?")
             .setNegativeButton("Yes") { _, _ ->
-                // If confirmed, delete the student and show Snackbar with Undo option
                 students.removeAt(position)
                 studentAdapter.notifyItemRemoved(position)
 
