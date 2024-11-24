@@ -20,7 +20,29 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var listView: ListView
-    private val studentList = mutableListOf<Pair<String, String>>() // Lưu danh sách (Họ tên, MSSV)
+    private val studentList = mutableListOf<Pair<String, String>>(
+        "Nguyen Van A" to "1001",
+        "Tran Thi B" to "1002",
+        "Le Van C" to "1003",
+        "Pham Thi D" to "1004",
+        "Hoang Van E" to "1005",
+        "Dang Thi F" to "1006",
+        "Vu Van G" to "1007",
+        "Nguyen Thi H" to "1008",
+        "Tran Van I" to "1009",
+        "Le Thi J" to "1010",
+        "Pham Van K" to "1011",
+        "Hoang Thi L" to "1012",
+        "Dang Van M" to "1013",
+        "Vu Thi N" to "1014",
+        "Nguyen Van O" to "1015",
+        "Tran Thi P" to "1016",
+        "Le Van Q" to "1017",
+        "Pham Thi R" to "1018",
+        "Hoang Van S" to "1019",
+        "Dang Thi T" to "1020"
+    )
+    // Lưu danh sách (Họ tên, MSSV)
     private lateinit var adapter: ArrayAdapter<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
