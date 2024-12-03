@@ -1,0 +1,33 @@
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/studentListFragment">
+
+    <fragment
+        android:id="@+id/studentListFragment"
+        android:name="com.example.studentmanager.StudentListFragment"
+        tools:layout="@layout/fragment_student_list">
+        <action
+            android:id="@+id/action_studentList_to_addStudent"
+            app:destination="@id/addStudentFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addStudentFragment"
+        android:name="com.example.studentmanager.AddStudentFragment"
+        tools:layout="@layout/fragment_add_student">
+        <argument
+            android:name="name"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="mssv"
+            app:argType="string"
+            android:defaultValue="" />
+        <action
+            android:id="@+id/action_addStudentFragment_to_studentListFragment"
+            app:destination="@id/studentListFragment" />
+    </fragment>
+
+
+</navigation>
