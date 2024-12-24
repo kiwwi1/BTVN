@@ -14,6 +14,9 @@ interface StudentDao {
     @Insert
     fun insert(student: Student)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(students: List<Student>) // Hàm chèn nhiều sinh viên
+
     @Update
     fun update(student: Student)
 
@@ -28,6 +31,9 @@ interface StudentDao {
 
     @Query("SELECT * FROM student WHERE mssv LIKE :keyword OR hoten LIKE :keyword")
     fun searchStudents(keyword: String): List<Student>
+
+    @Query("DELETE FROM Student WHERE id = :id")
+    fun deleteById(id: Int)
 }
 
 

@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import com.example.studentmanagementroom.databinding.ActivityDetailBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DetailActivity : AppCompatActivity() {
 
@@ -21,7 +19,7 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var updateButton: Button
     private lateinit var deleteButton: Button
     private lateinit var appDatabase: AppDatabase
-    private lateinit var student: Student
+    private var studentId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,33 +31,77 @@ class DetailActivity : AppCompatActivity() {
         emailEditText = findViewById(R.id.emailEditText)
         updateButton = findViewById(R.id.updateButton)
         deleteButton = findViewById(R.id.deleteButton)
-
         appDatabase = AppDatabase.getInstance(this)
 
-        // Lấy dữ liệu từ Intent
-        val studentId = intent.getIntExtra("studentId", -1)
-        student = appDatabase.studentDao().getStudentById(studentId) ?: return
+        // Lấy `studentId` từ intent
+        studentId = intent.getIntExtra("studentId", -1)
 
-        mssvEditText.setText(student.mssv)
-        hotenEditText.setText(student.hoten)
-        ngaysinhEditText.setText(student.ngaysinh)
-        emailEditText.setText(student.email)
+        // Load dữ liệu sinh viên từ cơ sở dữ liệu
+        loadStudentDetails()
 
+        // Cập nhật thông tin sinh viên
         updateButton.setOnClickListener {
-            student = student.copy(
-                mssv = mssvEditText.text.toString(),
-                hoten = hotenEditText.text.toString(),
-                ngaysinh = ngaysinhEditText.text.toString(),
-                email = emailEditText.text.toString()
-            )
-            appDatabase.studentDao().update(student)
-            Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
+            updateStudent()
         }
 
+        // Xóa sinh viên
         deleteButton.setOnClickListener {
-            appDatabase.studentDao().delete(student)
-            Toast.makeText(this, "Xóa sinh viên thành công", Toast.LENGTH_SHORT).show()
-            finish()
+            deleteStudent()
+        }
+    }
+
+    private fun loadStudentDetails() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val student = withContext(Dispatchers.IO) {
+                appDatabase.studentDao().getStudentById(studentId)
+            }
+            if (student != null) {
+                mssvEditText.setText(student.mssv)
+                hotenEditText.setText(student.hoten)
+                ngaysinhEditText.setText(student.ngaysinh)
+                emailEditText.setText(student.email)
+            } else {
+                Toast.makeText(this@DetailActivity, "Không tìm thấy sinh viên!", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
+    }
+
+    private fun updateStudent() {
+        val mssv = mssvEditText.text.toString()
+        val hoten = hotenEditText.text.toString()
+        val ngaysinh = ngaysinhEditText.text.toString()
+        val email = emailEditText.text.toString()
+
+        if (mssv.isNotBlank() && hoten.isNotBlank() && ngaysinh.isNotBlank() && email.isNotBlank()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val student = Student(
+                    id = studentId,
+                    mssv = mssv,
+                    hoten = hoten,
+                    ngaysinh = ngaysinh,
+                    email = email
+                )
+                appDatabase.studentDao().update(student)
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@DetailActivity, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
+        } else {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun deleteStudent() {
+        CoroutineScope(Dispatchers.IO).launch {
+            appDatabase.studentDao().deleteById(studentId)
+
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@DetailActivity, "Xóa thành công!", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
     }
 }
