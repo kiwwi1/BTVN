@@ -34,6 +34,9 @@ interface StudentDao {
 
     @Query("DELETE FROM Student WHERE id = :id")
     fun deleteById(id: Int)
+
+    @Delete
+    fun deleteStudents(students: List<Student>) // Hàm xóa nhiều sinh viên
 }
 
 

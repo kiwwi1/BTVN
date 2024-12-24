@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -42,9 +43,7 @@ class MainActivity : AppCompatActivity() {
         // Thêm dữ liệu mẫu nếu cần
         activityScope.launch {
             withContext(Dispatchers.IO) {
-                if (appDatabase.studentDao().getAllStudents().isEmpty()) {
                     addSampleData()
-                }
             }
             loadStudents() // Load dữ liệu sinh viên sau khi thêm dữ liệu mẫu
         }
@@ -72,7 +71,26 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
+            R.id.action_delete -> {
+                deleteSelectedStudents() // Gọi hàm xóa nhiều sinh viên
+                return true
+            }
             else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+    // Hàm xóa các sinh viên đã chọn
+    private fun deleteSelectedStudents() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val selectedStudents = adapter.getSelectedStudents()
+            if (selectedStudents.isNotEmpty()) {
+                withContext(Dispatchers.IO) {
+                    appDatabase.studentDao().deleteStudents(selectedStudents) // Xóa trong cơ sở dữ liệu
+                }
+                loadStudents() // Cập nhật lại danh sách
+            } else {
+                Toast.makeText(this@MainActivity, "Không có sinh viên nào được chọn!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
